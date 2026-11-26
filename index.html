@@ -1,0 +1,1261 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FocusFlow | Smart Study Planner</title>
+
+<style>
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #20243a;
+  --muted: #7b8198;
+  --primary: #6c63ff;
+  --border: #e8eaf2;
+  --green: #19b88a;
+  --red: #ef5b75;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 235px;
+  background: white;
+  padding: 30px 20px;
+  border-right: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 40px;
+}
+
+.logo span {
+  color: #252943;
+}
+
+.nav-title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  margin: 25px 10px 12px;
+}
+
+.nav-item {
+  padding: 13px 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  color: #70758c;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.nav-item.active,
+.nav-item:hover {
+  background: #efeeff;
+  color: var(--primary);
+}
+
+.main {
+  flex: 1;
+  padding: 35px;
+  max-width: 1500px;
+  margin: auto;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 28px;
+}
+
+.header p {
+  color: var(--muted);
+  margin-top: 7px;
+}
+
+.date {
+  background: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: var(--card);
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+}
+
+.stat-card .label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stat-card h2 {
+  font-size: 30px;
+  margin: 12px 0 5px;
+}
+
+.stat-card small {
+  color: var(--green);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 20px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.panel-header h2 {
+  font-size: 18px;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 11px 15px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.secondary {
+  background: #efeeff;
+  color: var(--primary);
+}
+
+.danger {
+  background: #fff0f2;
+  color: var(--red);
+}
+
+.task-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.task-form input,
+.task-form select,
+.task-form button {
+  width: 100%;
+}
+
+input,
+select {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  background: white;
+  color: var(--text);
+}
+
+input:focus,
+select:focus {
+  border-color: var(--primary);
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+
+.task.done {
+  opacity: 0.6;
+}
+
+.task.done .task-title {
+  text-decoration: line-through;
+}
+
+.task-check {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.task-meta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.priority {
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #f0efff;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.priority.High {
+  background: #fff0f2;
+  color: var(--red);
+}
+
+.priority.Medium {
+  background: #fff7e7;
+  color: #c58b19;
+}
+
+.priority.Low {
+  background: #e9faf4;
+  color: #159b71;
+}
+
+.delete-btn {
+  background: transparent;
+  color: var(--muted);
+  padding: 6px;
+  font-size: 18px;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 25px 10px;
+}
+
+.progress-bar {
+  height: 10px;
+  background: #efeff6;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6c63ff, #a69fff);
+  width: 0%;
+  border-radius: 20px;
+  transition: width 0.4s;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.timer {
+  text-align: center;
+  padding: 15px 0;
+}
+
+.timer-mode {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.timer-mode button {
+  font-size: 12px;
+  padding: 9px 12px;
+}
+
+.timer-mode button.active {
+  background: var(--primary);
+  color: white;
+}
+
+.timer-display {
+  font-size: 55px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin: 25px 0;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.chart {
+  display: flex;
+  align-items: end;
+  justify-content: space-around;
+  height: 170px;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.chart-day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: end;
+}
+
+.bar-area {
+  height: 125px;
+  width: 100%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
+
+.bar {
+  width: 65%;
+  max-width: 35px;
+  min-height: 3px;
+  border-radius: 7px 7px 2px 2px;
+  background: #d9d6ff;
+  transition: height 0.3s;
+}
+
+.bar.today {
+  background: var(--primary);
+}
+
+.chart-day small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.chart-day strong {
+  font-size: 11px;
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.subject-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subject-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.subject-row span {
+  color: var(--muted);
+}
+
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 15px;
+}
+
+@media (max-width: 1050px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    width: 75px;
+    padding: 20px 8px;
+  }
+
+  .logo {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .logo span,
+  .nav-title,
+  .nav-item .nav-label {
+    display: none;
+  }
+
+  .nav-item {
+    text-align: center;
+    padding: 14px 5px;
+    font-size: 20px;
+  }
+
+  .main {
+    padding: 20px 12px;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header h1 {
+    font-size: 23px;
+  }
+
+  .stats {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-card h2 {
+    font-size: 24px;
+  }
+
+  .panel {
+    padding: 17px;
+  }
+
+  .task-form {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-display {
+    font-size: 45px;
+  }
+
+  .task {
+    flex-wrap: wrap;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="logo">Focus<span>Flow</span> ✦</div>
+
+    <div class="nav-title">MENU</div>
+
+    <div class="nav-item active" data-section="dashboard">
+      📊 <span class="nav-label">Dashboard</span>
+    </div>
+
+    <div class="nav-item" data-section="tasks">
+      📝 <span class="nav-label">My Tasks</span>
+    </div>
+
+    <div class="nav-item" data-section="statistics">
+      📈 <span class="nav-label">Statistics</span>
+    </div>
+
+    <div class="nav-title">TOOLS</div>
+
+    <div class="nav-item" data-section="timer">
+      ⏱️ <span class="nav-label">Focus Timer</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="header">
+      <div>
+        <h1 id="greeting">Good day, Student! 👋</h1>
+        <p>Small steps every day lead to big results.</p>
+      </div>
+
+      <div class="date" id="todayDate"></div>
+    </header>
+
+    <!-- DASHBOARD -->
+
+    <section class="section active" id="dashboard">
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="label">Total Tasks</div>
+          <h2 id="totalTasks">0</h2>
+          <small>📚 Your study goals</small>
+        </div>
+
+        <div class="stat-card">
+          <div class="label">Completed</div>
+          <h2 id="completedTasks">0</h2>
+          <small>✅ Great progress</small>
+        </div>
+
+        <div class="stat-card">
+          <div class="label">Completion Rate</div>
+          <h2 id="completionRate">0%</h2>
+          <small>🎯 Keep going</small>
+        </div>
+
+        <div class="stat-card">
+          <div class="label">Focus Minutes</div>
+          <h2 id="focusMinutes">0</h2>
+          <small>⏱️ Total focus time</small>
+        </div>
+      </div>
+
+      <div class="content-grid">
+
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Today's Study Tasks</h2>
+              <button class="secondary" onclick="showSection('tasks')">
+                + Add Task
+              </button>
+            </div>
+
+            <div id="dashboardTasks" class="task-list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Weekly Focus Hours</h2>
+            </div>
+
+            <div class="chart" id="weeklyChart"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Daily Progress</h2>
+            </div>
+
+            <div class="progress-row">
+              <span>Tasks completed</span>
+              <strong id="progressText">0 / 0</strong>
+            </div>
+
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <p style="color:var(--muted);font-size:13px">
+              Stay consistent. Your future self will thank you!
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Subject Overview</h2>
+            </div>
+
+            <div class="subject-list" id="subjectOverview"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2>Quick Focus</h2>
+            </div>
+
+            <p style="color:var(--muted);font-size:13px;margin-bottom:15px">
+              Start a focus session and work without distractions.
+            </p>
+
+            <button class="primary" style="width:100%"
+              onclick="showSection('timer')">
+              Start Focus Session →
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TASKS -->
+
+    <section class="section" id="tasks">
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>My Study Tasks</h2>
+          <button class="secondary" onclick="exportCSV()">
+            ↓ Export CSV
+          </button>
+        </div>
+
+        <form class="task-form" id="taskForm">
+
+          <input id="taskTitle"
+            placeholder="Enter study task..."
+            required maxlength="120">
+
+          <select id="taskSubject">
+            <option value="Computer Networks">Computer Networks</option>
+            <option value="Software Engineering">Software Engineering</option>
+            <option value="Artificial Intelligence">Artificial Intelligence</option>
+            <option value="Machine Learning">Machine Learning</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <select id="taskPriority">
+            <option value="High">High Priority</option>
+            <option value="Medium" selected>Medium Priority</option>
+            <option value="Low">Low Priority</option>
+          </select>
+
+          <input type="date" id="taskDate" required>
+
+          <button class="primary" type="submit">
+            + Add Study Task
+          </button>
+
+          <button class="secondary" type="button"
+            onclick="clearCompleted()">
+            Clear Completed
+          </button>
+
+        </form>
+
+        <div class="panel-header">
+          <h2>Task List</h2>
+
+          <select id="taskFilter" onchange="renderTasks()"
+            style="max-width:160px">
+            <option value="all">All Tasks</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <div id="allTasks" class="task-list"></div>
+      </div>
+
+    </section>
+
+    <!-- STATISTICS -->
+
+    <section class="section" id="statistics">
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Study Statistics</h2>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <div class="label">Tasks Created</div>
+            <h2 id="statTotal">0</h2>
+          </div>
+
+          <div class="stat-card">
+            <div class="label">Tasks Completed</div>
+            <h2 id="statDone">0</h2>
+          </div>
+
+          <div class="stat-card">
+            <div class="label">Focus Sessions</div>
+            <h2 id="statSessions">0</h2>
+          </div>
+
+          <div class="stat-card">
+            <div class="label">Focus Hours</div>
+            <h2 id="statHours">0</h2>
+          </div>
+        </div>
+
+        <h3 style="margin:25px 0 10px">Weekly Focus Activity</h3>
+        <div class="chart" id="statisticsChart"></div>
+      </div>
+
+    </section>
+
+    <!-- TIMER -->
+
+    <section class="section" id="timer">
+
+      <div class="panel" style="max-width:650px;margin:auto">
+
+        <div class="panel-header">
+          <h2>Pomodoro Focus Timer</h2>
+        </div>
+
+        <p style="text-align:center;color:var(--muted);margin-bottom:20px">
+          Focus on one task at a time.
+        </p>
+
+        <div class="timer-mode">
+          <button class="secondary active" data-minutes="25"
+            onclick="setTimer(25,this)">
+            Focus 25 min
+          </button>
+
+          <button class="secondary" data-minutes="5"
+            onclick="setTimer(5,this)">
+            Short Break
+          </button>
+
+          <button class="secondary" data-minutes="15"
+            onclick="setTimer(15,this)">
+            Long Break
+          </button>
+        </div>
+
+        <div class="timer">
+          <div class="timer-display" id="timerDisplay">25:00</div>
+
+          <div class="timer-controls">
+            <button class="primary" id="timerStart"
+              onclick="toggleTimer()">
+              ▶ Start
+            </button>
+
+            <button class="secondary" onclick="resetTimer()">
+              ↻ Reset
+            </button>
+          </div>
+        </div>
+
+        <p style="text-align:center;color:var(--muted);font-size:13px">
+          Completed focus sessions are added to your study statistics.
+        </p>
+
+      </div>
+
+    </section>
+
+    <div class="footer">
+      FocusFlow © 2026 | Plan • Focus • Achieve
+    </div>
+
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY = "focusflow_tasks_v1";
+const STATS_KEY = "focusflow_stats_v1";
+
+let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+let stats = JSON.parse(localStorage.getItem(STATS_KEY) || "{}");
+
+let timerSeconds = 25 * 60;
+let timerInterval = null;
+let timerRunning = false;
+let currentTimerMinutes = 25;
+
+function todayString() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+}
+
+function initialize() {
+  document.getElementById("todayDate").textContent =
+    new Date().toLocaleDateString("en-IN", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+
+  const hour = new Date().getHours();
+
+  let greeting = "Good day";
+
+  if (hour < 12) greeting = "Good morning";
+  else if (hour < 17) greeting = "Good afternoon";
+  else greeting = "Good evening";
+
+  document.getElementById("greeting").textContent =
+    greeting + ", Student! 👋";
+
+  document.getElementById("taskDate").value = todayString();
+
+  renderAll();
+}
+
+function showSection(sectionId) {
+  document.querySelectorAll(".section").forEach(section => {
+    section.classList.remove("active");
+  });
+
+  document.getElementById(sectionId).classList.add("active");
+
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.classList.toggle(
+      "active",
+      item.dataset.section === sectionId
+    );
+  });
+
+  if (sectionId === "tasks") renderTasks();
+}
+
+document.querySelectorAll(".nav-item").forEach(item => {
+  item.addEventListener("click", () => {
+    showSection(item.dataset.section);
+  });
+});
+
+document.getElementById("taskForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const title = document.getElementById("taskTitle").value.trim();
+  const subject = document.getElementById("taskSubject").value;
+  const priority = document.getElementById("taskPriority").value;
+  const date = document.getElementById("taskDate").value;
+
+  if (!title || !date) return;
+
+  tasks.unshift({
+    id: Date.now(),
+    title,
+    subject,
+    priority,
+    date,
+    completed: false,
+    createdAt: todayString()
+  });
+
+  saveData();
+  this.reset();
+
+  document.getElementById("taskDate").value = todayString();
+  document.getElementById("taskPriority").value = "Medium";
+
+  renderAll();
+});
+
+function toggleTask(id) {
+  const task = tasks.find(item => item.id === id);
+  if (!task) return;
+
+  task.completed = !task.completed;
+  task.completedAt = task.completed ? todayString() : null;
+
+  saveData();
+  renderAll();
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(task => task.id !== id);
+  saveData();
+  renderAll();
+}
+
+function clearCompleted() {
+  if (!tasks.some(task => task.completed)) {
+    alert("No completed tasks to clear.");
+    return;
+  }
+
+  if (!confirm("Delete all completed tasks?")) return;
+
+  tasks = tasks.filter(task => !task.completed);
+  saveData();
+  renderAll();
+}
+
+function taskHTML(task) {
+  const checked = task.completed ? "checked" : "";
+  const done = task.completed ? "done" : "";
+
+  return `
+    <div class="task ${done}">
+      <input class="task-check" type="checkbox"
+        ${checked}
+        onchange="toggleTask(${task.id})">
+
+      <div class="task-info">
+        <div class="task-title">${escapeHTML(task.title)}</div>
+        <div class="task-meta">
+          ${escapeHTML(task.subject)} · Due ${escapeHTML(task.date)}
+        </div>
+      </div>
+
+      <span class="priority ${task.priority}">
+        ${task.priority}
+      </span>
+
+      <button class="delete-btn"
+        onclick="deleteTask(${task.id})"
+        title="Delete task">×</button>
+    </div>
+  `;
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[character]));
+}
+
+function renderTasks() {
+  const filter = document.getElementById("taskFilter").value;
+
+  let filtered = tasks;
+
+  if (filter === "pending") {
+    filtered = tasks.filter(task => !task.completed);
+  }
+
+  if (filter === "completed") {
+    filtered = tasks.filter(task => task.completed);
+  }
+
+  const container = document.getElementById("allTasks");
+
+  container.innerHTML = filtered.length
+    ? filtered.map(taskHTML).join("")
+    : `<div class="empty">No tasks found. Add a study task to get started! ✨</div>`;
+}
+
+function renderDashboardTasks() {
+  const today = todayString();
+
+  const todaysTasks = tasks.filter(task => task.date === today);
+
+  const container = document.getElementById("dashboardTasks");
+
+  container.innerHTML = todaysTasks.length
+    ? todaysTasks.slice(0, 5).map(taskHTML).join("")
+    : `<div class="empty">No tasks for today. Enjoy your free time or plan ahead! 📚</div>`;
+}
+
+function renderStats() {
+  const total = tasks.length;
+  const completed = tasks.filter(task => task.completed).length;
+  const rate = total ? Math.round(completed / total * 100) : 0;
+
+  document.getElementById("totalTasks").textContent = total;
+  document.getElementById("completedTasks").textContent = completed;
+  document.getElementById("completionRate").textContent = rate + "%";
+
+  document.getElementById("progressText").textContent =
+    `${completed} / ${total}`;
+
+  document.getElementById("progressFill").style.width = rate + "%";
+
+  const totalMinutes = Object.values(stats).reduce(
+    (sum, day) => sum + (day.minutes || 0), 0
+  );
+
+  document.getElementById("focusMinutes").textContent = totalMinutes;
+
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statDone").textContent = completed;
+
+  const sessions = Object.values(stats).reduce(
+    (sum, day) => sum + (day.sessions || 0), 0
+  );
+
+  document.getElementById("statSessions").textContent = sessions;
+
+  document.getElementById("statHours").textContent =
+    (totalMinutes / 60).toFixed(1);
+
+  renderSubjectOverview();
+}
+
+function renderSubjectOverview() {
+  const subjects = {};
+
+  tasks.forEach(task => {
+    if (!subjects[task.subject]) {
+      subjects[task.subject] = { total: 0, completed: 0 };
+    }
+
+    subjects[task.subject].total++;
+
+    if (task.completed) {
+      subjects[task.subject].completed++;
+    }
+  });
+
+  const container = document.getElementById("subjectOverview");
+
+  const entries = Object.entries(subjects);
+
+  container.innerHTML = entries.length
+    ? entries.map(([subject, data]) => `
+      <div class="subject-row">
+        <strong>${escapeHTML(subject)}</strong>
+        <span>${data.completed}/${data.total} completed</span>
+      </div>
+    `).join("")
+    : `<div class="empty">Your subjects will appear here.</div>`;
+}
+
+function renderChart(elementId) {
+  const container = document.getElementById(elementId);
+
+  const days = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+
+    const key = date.getFullYear() + "-" +
+      String(date.getMonth() + 1).padStart(2, "0") + "-" +
+      String(date.getDate()).padStart(2, "0");
+
+    days.push({
+      key,
+      label: date.toLocaleDateString("en-US", { weekday: "short" }),
+      minutes: stats[key]?.minutes || 0
+    });
+  }
+
+  const max = Math.max(...days.map(day => day.minutes), 60);
+
+  container.innerHTML = days.map(day => {
+    const height = Math.max(3, day.minutes / max * 100);
+
+    return `
+      <div class="chart-day">
+        <strong>${day.minutes}</strong>
+        <div class="bar-area">
+          <div class="bar ${day.key === todayString() ? "today" : ""}"
+            style="height:${height}%"></div>
+        </div>
+        <small>${day.label}</small>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderAll() {
+  renderStats();
+  renderTasks();
+  renderDashboardTasks();
+  renderChart("weeklyChart");
+  renderChart("statisticsChart");
+}
+
+// Pomodoro timer
+
+function setTimer(minutes, button) {
+  stopTimer();
+
+  currentTimerMinutes = minutes;
+  timerSeconds = minutes * 60;
+
+  document.querySelectorAll(".timer-mode button").forEach(item => {
+    item.classList.remove("active");
+  });
+
+  button.classList.add("active");
+
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(timerSeconds / 60);
+  const seconds = timerSeconds % 60;
+
+  document.getElementById("timerDisplay").textContent =
+    String(minutes).padStart(2, "0") + ":" +
+    String(seconds).padStart(2, "0");
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
+}
+
+function startTimer() {
+  if (timerSeconds <= 0) {
+    timerSeconds = currentTimerMinutes * 60;
+  }
+
+  timerRunning = true;
+
+  document.getElementById("timerStart").textContent = "❚❚ Pause";
+
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+
+    updateTimerDisplay();
+
+    if (timerSeconds <= 0) {
+      stopTimer();
+
+      if (currentTimerMinutes === 25) {
+        recordFocusSession(25);
+        alert("Focus session completed! Great work! 🎉");
+      } else {
+        alert("Break completed. Ready to focus again?");
+      }
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+
+  document.getElementById("timerStart").textContent = "▶ Start";
+}
+
+function resetTimer() {
+  stopTimer();
+  timerSeconds = currentTimerMinutes * 60;
+  updateTimerDisplay();
+}
+
+function recordFocusSession(minutes) {
+  const today = todayString();
+
+  if (!stats[today]) {
+    stats[today] = { minutes: 0, sessions: 0 };
+  }
+
+  stats[today].minutes += minutes;
+  stats[today].sessions += 1;
+
+  saveData();
+  renderAll();
+}
+
+function exportCSV() {
+  if (!tasks.length) {
+    alert("Add some tasks before exporting.");
+    return;
+  }
+
+  const headers = ["Task", "Subject", "Priority", "Due Date", "Completed"];
+
+  const rows = tasks.map(task => [
+    task.title,
+    task.subject,
+    task.priority,
+    task.date,
+    task.completed ? "Yes" : "No"
+  ]);
+
+  const csv = [headers, ...rows]
+    .map(row => row.map(value =>
+      '"' + String(value).replace(/"/g, '""') + '"'
+    ).join(","))
+    .join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "FocusFlow-Study-Tasks.csv";
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
+initialize();
+updateTimerDisplay();
+</script>
+
+</body>
+</html>
